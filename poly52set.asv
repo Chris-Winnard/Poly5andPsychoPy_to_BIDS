@@ -1,0 +1,51 @@
+function poly52set(basePath, participantNumber)
+
+    basePath1 = convertCharsToStrings(basePath);
+    participantNumber1 = convertCharsToStrings(participantNumber);
+    rawDataPath1 = basePath + '\Raw Data\P' + participantNumber + '\';
+
+    %scalp:
+    fileName = 'P' + participantNumber + '_scalp';
+    fileName_full = fileName + '.Poly5';
+
+    ChannelLabels = {'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8', 'FC5', 'FC1', 'FC2', 'FC6', 'M1', 'T7',...
+    'C3', 'Cz', 'C4', 'T8', 'M2', 'CP5', 'CP1', 'CP2', 'CP6', 'P7', 'P3', 'Pz', 'P4', 'P8', 'POz', 'O1', 'Oz', 'O2'}; %Probably best to check.
+    
+    addpath("C:\Users\cjwin\OneDrive - Queen Mary, University of London\Documents\eeglab2023.0 MINIMAL PLUGINS_old");
+
+    EEG = pop_loadpoly5_2('filepath',rawDataPath,'filename',fileName_full,'ref_ch',[],'NaNdiscSamples',true,'ChannelsDiscThd',1,'EnableSaturationDisc',true,'EnableSameValueDisc',false,'ChannelLabels',ChannelLabels);
+
+    EEG=pop_select(EEG,'channel',1:32);
+    
+    %save as EEGLAB struct (useful for Python work):
+    setFilePath = basePath + '\EEG Set Files (Unprocessed)\';
+    outputFilePath = setFilePath + fileName + '.set';
+    save(outputFilePath)
+    %pop_saveset(EEG1) %saves it as EEG structure
+
+    %Now do something very similar for the ceegrid data:
+    basePath = convertCharsToStrings(basePath);
+    participantNumber = convertCharsToStrings(participantNumber);
+    rawDataPath = basePath + '\Raw Data\P' + participantNumber + '\';
+    fileName = 'P' + participantNumber + '_ceegrid';
+    fileName_full = fileName + '.Poly5';
+    fileName_full = convertStringsToChars(fileName_full);
+
+    %ceegrid - Fpz is reference:
+    ChannelLabels = {'cEL1', 'cEL2', 'cEL3', 'cEL4', 'cEL5', 'cEL6', 'cEL7', 'cEL8','cEL9','cEL10','Fpz', '', '', '', '', '',...
+                     'cER1', 'cER2', 'cER3', 'cER4', 'cER5', 'cER6', 'cER7', 'cER8', 'cER9', 'cER10', '','','','','',''};
+
+    EEG = pop_loadpoly5_2('filepath',rawDataPath,'filename',fileName_full,'ref_ch',[],'NaNdiscSamples',true,'ChannelsDiscThd',1,'EnableSaturationDisc',true,'EnableSameValueDisc',false,'ChannelLabels',ChannelLabels);
+
+    %We remove empty channels:
+%    EEG=pop_select(EEG,'channel',[1:11, 17:26]);
+    
+    EEG = pop_loadpoly5_2('filepath',rawDataPath,'filename',fileName_full,'ref_ch',[],'NaNdiscSamples',true,'ChannelsDiscThd',1,'EnableSaturationDisc',true,'EnableSameValueDisc',false,'ChannelLabels',ChannelLabels);
+
+    EEG=pop_select(EEG,'channel',[1:11, 17:26]);
+    
+    %save as EEGLAB struct (useful for Python work):
+    setFilePath = basePath + '\EEG Set Files (Unprocessed)\';
+    outputFilePath = setFilePath + fileName + '.set';
+    save(outputFilePath)
+end
